@@ -1,8 +1,9 @@
 const passportLoader = require("./passport");
+const expressLoader = require("./express");
 
 module.exports = async (app) => {
   // Load Express middlewares
-  // const expressApp = await expressLoader(app);
+  const expressApp = await expressLoader(app);
 
   // Load Passport middleware
   const passport = await passportLoader(expressApp);

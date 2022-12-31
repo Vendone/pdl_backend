@@ -1,18 +1,8 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-const morgan = require("morgan");
-const cors = require("cors");
-const loaders = require("./loaders");
 const app = express();
+
+const loaders = require("./loaders");
 const port = process.env.PORT;
-
-app.use(bodyParser.json());
-app.use(morgan("dev"));
-app.use(cors());
-
-app.get("/", (req, res) => {
-  res.status(200).send({ msg: "Pro Darts League Backend" });
-});
 
 async function startServer() {
   // Init application loaders
