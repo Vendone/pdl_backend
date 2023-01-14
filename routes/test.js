@@ -1,9 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-// const OrderService = require("../services/OrderService");
-// const OrderServiceInstance = new OrderService();
-
 //Datenbank verbindung
 const db = require("../db");
 const pgp = require("pg-promise")({ capSQL: true });
