@@ -3,7 +3,6 @@ const router = express.Router();
 
 //Datenbank verbindung
 const db = require("../db");
-const pgp = require("pg-promise")({ capSQL: true });
 
 //Exports
 module.exports = (app) => {
@@ -13,21 +12,17 @@ module.exports = (app) => {
     res.status(200).send({ msg: "Test" });
   });
 
-  router.get("/data", async (req, res, next) => {
+  router.get("/get", async (req, res, next) => {
     const statement = `SELECT * FROM test`;
     try {
       const result = await db.query(statement);
-
-      if (result.rows?.length) {
-        console.log(result.rows);
-      }
       res.status(200).send(result.rows);
     } catch (err) {
       console.log(err);
     }
   });
 
-  router.post("/data", async (req, res, next) => {
+  router.post("/post", async (req, res, next) => {
     const statement = "INSERT INTO test(test) VALUES($1)";
     const values = ["info"];
     try {
