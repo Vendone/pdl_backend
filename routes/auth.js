@@ -45,14 +45,14 @@ module.exports = (app, passport) => {
 
   router.post(
     "/login",
-    check("email").isEmail().normalizeEmail(),
+    check("username").isEmail().normalizeEmail(),
     check("password").notEmpty(),
     passport.authenticate("local"),
     async (req, res, next) => {
       async function findOneByEmail(email) {
         const statement = `SELECT *
-      FROM users
-      WHERE email = $1`;
+        FROM users
+        WHERE email = $1`;
         const values = [email];
         const user = await db.query(statement, values);
 
@@ -70,7 +70,6 @@ module.exports = (app, passport) => {
         //user finden
         const response = await findOneByEmail(username);
         delete response.password;
-        console.log(req.user.id);
         res.status(200).send(response);
       } catch (err) {
         next(err);
