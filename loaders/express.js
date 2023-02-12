@@ -3,14 +3,14 @@ const cors = require("cors");
 const morgan = require("morgan");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
+const pg = require("pg");
 
 //connect with PostgresSQL
-const { Pool } = require("pg");
 const connectionString = {
   connectionString: process.env.DATABASE_URL,
 };
 
-const pool = new Pool(connectionString);
+const pgPool = new pg.Pool(connectionString);
 
 module.exports = (app) => {
   app.use(bodyParser.json());
@@ -28,7 +28,7 @@ module.exports = (app) => {
         maxAge: 24 * 60 * 60 * 1000,
       },
       store: new pgSession({
-        pool: pool, // Connection pool
+        pool: pgPool, // Connection pool
         tableName: "user_sessions", // Use another table-name than the default "session" one
         // Insert connect-pg-simple options here
       }),
