@@ -24,7 +24,7 @@ module.exports = (app) => {
       resave: false,
       saveUninitialized: false,
       cookie: {
-        secure: false,
+        secure: true,
         maxAge: 24 * 60 * 60 * 1000,
       },
       store: new pgSession({
