@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const { check } = require("express-validator");
 const db = require("../db");
 const pgp = require("pg-promise")({ capSQL: true });
+const { findOneByEmail } = require("../helperFunctions/index");
 
 module.exports = (app, passport) => {
   app.use("/api/auth", router);
@@ -49,20 +50,20 @@ module.exports = (app, passport) => {
     check("password").notEmpty(),
     passport.authenticate("local"),
     async (req, res, next) => {
-      async function findOneByEmail(email) {
-        const statement = `SELECT *
-        FROM users
-        WHERE email = $1`;
-        const values = [email];
-        const user = await db.query(statement, values);
+      // async function findOneByEmail(email) {
+      //   const statement = `SELECT *
+      //   FROM users
+      //   WHERE email = $1`;
+      //   const values = [email];
+      //   const user = await db.query(statement, values);
 
-        if (!user) {
-          return done(null, false, {
-            message: "Incorrect username or password.",
-          });
-        }
-        return user.rows[0];
-      }
+      //   if (!user) {
+      //     return done(null, false, {
+      //       message: "Incorrect username or password.",
+      //     });
+      //   }
+      //   return user.rows[0];
+      // }
 
       try {
         const { username, password } = req.body;

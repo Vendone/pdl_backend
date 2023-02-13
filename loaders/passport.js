@@ -2,6 +2,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const db = require("../db");
 const bcrypt = require("bcrypt");
+const { findOneByEmail } = require("../helperFunctions/index");
 
 module.exports = (app) => {
   // Initialize passport
@@ -23,20 +24,6 @@ module.exports = (app) => {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       //find user in database
-      async function findOneByEmail(email) {
-        const statement = `SELECT *
-      FROM users
-      WHERE email = $1`;
-        const values = [email];
-        const user = await db.query(statement, values);
-
-        if (!user) {
-          return done(null, false, {
-            message: "Incorrect username or password.",
-          });
-        }
-        return user.rows[0];
-      }
 
       const user = await findOneByEmail(username);
 
