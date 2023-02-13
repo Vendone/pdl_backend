@@ -14,4 +14,17 @@ WHERE email = $1`;
   }
   return user.rows[0];
 }
-module.exports = { findOneByEmail };
+
+async function findOneById(id) {
+  const statement = `SELECT *
+  FROM users
+  WHERE id = $1`;
+  const values = [id];
+  const user = await db.query(statement, values);
+
+  if (user.rows?.length) {
+    return user.rows[0];
+  }
+}
+
+module.exports = { findOneByEmail, findOneById };
