@@ -110,3 +110,5 @@ ALTER TABLE "user_stats" ADD FOREIGN KEY ("userid") REFERENCES "users" ("id");
 ALTER TABLE "users" ALTER COLUMN "img" SET DEFAULT './blank.png';
 
 ALTER TABLE "users" ALTER COLUMN "createdAt" SET DEFAULT now();
+
+ALTER TABLE "users" ADD CONSTRAINT unique_email UNIQUE (email);
