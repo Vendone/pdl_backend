@@ -5,6 +5,7 @@ const { check } = require("express-validator");
 const db = require("../db");
 const pgp = require("pg-promise")({ capSQL: true });
 const { findOneByEmail } = require("../helperFunctions/index");
+const { findOneById } = require("../helperFunctions/index");
 
 module.exports = (app, passport) => {
   app.use("/api/auth", router);
@@ -50,28 +51,24 @@ module.exports = (app, passport) => {
     check("password").notEmpty(),
     passport.authenticate("local"),
     async (req, res, next) => {
-      // async function findOneByEmail(email) {
-      //   const statement = `SELECT *
-      //   FROM users
-      //   WHERE email = $1`;
-      //   const values = [email];
-      //   const user = await db.query(statement, values);
-
-      //   if (!user) {
-      //     return done(null, false, {
-      //       message: "Incorrect username or password.",
-      //     });
-      //   }
-      //   return user.rows[0];
-      // }
-
       try {
         const { username, password } = req.body;
 
         //user finden
-        const response = await findOneByEmail(username);
-        delete response.password;
-        res.status(200).send(response);
+        const user = await findOneByEmail(username);
+        // If no user found, reject
+        if (!user) {
+          res.status(401).send("no user found");
+        }
+
+        //Passwort überprüfen
+        const checkPassword = await bcrypt.compare(password, user.password);
+        if (!checkPassword) {
+          res.status(401).send("password is incorrect");
+        }
+        delete user.password;
+        delete user.id;
+        res.status(200).send(user);
       } catch (err) {
         next(err);
       }
@@ -80,17 +77,6 @@ module.exports = (app, passport) => {
 
   // Check Login Status Endpoint
   router.get("/logged_in", async (req, res, next) => {
-    async function findOneById(id) {
-      const statement = `SELECT *
-    FROM users
-    WHERE id = $1`;
-      const values = [id];
-      const user = await db.query(statement, values);
-
-      if (user.rows?.length) {
-        return user.rows[0];
-      }
-    }
     try {
       const { id } = req.user;
       const user = await findOneById(id.id);
