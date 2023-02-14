@@ -13,7 +13,7 @@ module.exports = (app) => {
   });
 
   router.get("/get", async (req, res, next) => {
-    const statement = `SELECT * FROM test`;
+    const statement = `SELECT * FROM users`;
     try {
       const result = await db.query(statement);
       res.status(200).send(result.rows);
