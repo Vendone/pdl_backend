@@ -53,22 +53,14 @@ module.exports = (app, passport) => {
     async (req, res, next) => {
       try {
         const { username, password } = req.body;
-
+        console.log(req.session);
         //user finden
         const user = await findOneByEmail(username);
         // If no user found, reject
         if (!user) {
           res.status(401).send("no user found");
         }
-
-        //Passwort überprüfen
-        const checkPassword = await bcrypt.compare(password, user.password);
-        if (!checkPassword) {
-          res.status(401).send("password is incorrect");
-        }
-        delete user.password;
-        delete user.id;
-        res.status(200).send(user);
+        res.status(200).send(req.user);
       } catch (err) {
         next(err);
       }
@@ -79,7 +71,8 @@ module.exports = (app, passport) => {
   router.get("/logged_in", async (req, res, next) => {
     try {
       const { id } = req.user;
-      const user = await findOneById(id.id);
+      console.log(req.session);
+      const user = await findOneById(6);
       delete user.password;
       res.status(200).send({
         loggedIn: true,

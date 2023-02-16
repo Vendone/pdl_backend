@@ -21,17 +21,17 @@ module.exports = (app) => {
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false,
+      resave: true,
+      saveUninitialized: true,
       cookie: {
         secure: true,
         maxAge: 24 * 60 * 60 * 1000,
       },
-      store: new pgSession({
-        pool: pgPool, // Connection pool
-        tableName: "user_sessions", // Use another table-name than the default "session" one
-        // Insert connect-pg-simple options here
-      }),
+      // store: new pgSession({
+      //   pool: pgPool, // Connection pool
+      //   tableName: "user_sessions", // Use another table-name than the default "session" one
+      //   // Insert connect-pg-simple options here
+      // }),
     })
   );
 
