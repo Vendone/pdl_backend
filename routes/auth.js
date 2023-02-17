@@ -47,20 +47,20 @@ module.exports = (app, passport) => {
 
   router.post(
     "/login",
-    check("username").isEmail().normalizeEmail(),
+    check("email").isEmail().normalizeEmail(),
     check("password").notEmpty(),
     passport.authenticate("local"),
     async (req, res, next) => {
       try {
-        const { username, password } = req.body;
+        // const { email, password } = req.body;
+        // //user finden
+        // const user = await findOneByEmail(email);
+        // // If no user found, reject
+        // if (!user) {
+        //   res.status(401).send("no user found");
+        // }
         console.log(req.session);
-        //user finden
-        const user = await findOneByEmail(username);
-        // If no user found, reject
-        if (!user) {
-          res.status(401).send("no user found");
-        }
-        res.status(200).send(req.user);
+        res.status(200).send(req.user.id + " and " + req.session.id);
       } catch (err) {
         next(err);
       }
@@ -72,7 +72,7 @@ module.exports = (app, passport) => {
     try {
       const { id } = req.user;
       console.log(req.session);
-      const user = await findOneById(6);
+      const user = await findOneById(id);
       delete user.password;
       res.status(200).send({
         loggedIn: true,
