@@ -33,8 +33,12 @@ module.exports = (app) => {
     done(null, user.id);
   });
 
-  passport.deserializeUser((user, done) => {
-    done(null, findOneById(user.id));
+  passport.deserializeUser(async (id, done) => {
+    const user = await findOneById(id);
+    if (!user) {
+      done(error);
+    }
+    done(null, user);
   });
 
   // Initialize passport
