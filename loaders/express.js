@@ -4,7 +4,6 @@ const morgan = require("morgan");
 const pg = require("pg");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
-const pgSession = require("connect-pg-simple")(session);
 const connectionString = {
   connectionString: process.env.DATABASE_URL,
 };
