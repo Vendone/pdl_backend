@@ -1,4 +1,5 @@
 const db = require("../db");
+const bcrypt = require("bcrypt");
 
 async function findOneByEmail(email) {
   const statement = `SELECT *
@@ -27,4 +28,10 @@ async function findOneById(id) {
   }
 }
 
-module.exports = { findOneByEmail, findOneById };
+async function compareIt(password, userDb) {
+  const validPassword = await bcrypt.compare(password, userDb.password);
+  const passwordIsCorrect = await validPassword;
+  return passwordIsCorrect;
+}
+
+module.exports = { findOneByEmail, findOneById, compareIt };

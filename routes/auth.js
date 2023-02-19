@@ -21,6 +21,10 @@ module.exports = (app, passport) => {
     async (req, res, next) => {
       try {
         const data = req.body;
+        const checkUser = await findOneByEmail(data.email);
+        if (checkUser) {
+          res.status(403).send("user alredy exists");
+        }
         const hashedPassword = await bcrypt.hash(data.password, 10);
 
         const cleanData = {
@@ -47,28 +51,14 @@ module.exports = (app, passport) => {
 
   router.post(
     "/login",
-    check("username").isEmail().normalizeEmail(),
+    check("email").isEmail().normalizeEmail(),
     check("password").notEmpty(),
     passport.authenticate("local"),
     async (req, res, next) => {
       try {
-        const { username, password } = req.body;
-
-        //user finden
-        const user = await findOneByEmail(username);
-        // If no user found, reject
-        if (!user) {
-          res.status(401).send("no user found");
-        }
-
-        //Passwort überprüfen
-        const checkPassword = await bcrypt.compare(password, user.password);
-        if (!checkPassword) {
-          res.status(401).send("password is incorrect");
-        }
-        delete user.password;
-        delete user.id;
-        res.status(200).send(user);
+        const result = req.user;
+        delete result.password;
+        res.status(200).send(result);
       } catch (err) {
         next(err);
       }
@@ -78,8 +68,7 @@ module.exports = (app, passport) => {
   // Check Login Status Endpoint
   router.get("/logged_in", async (req, res, next) => {
     try {
-      const { id } = req.user;
-      const user = await findOneById(id.id);
+      const user = await findOneById(req.user.id);
       delete user.password;
       res.status(200).send({
         loggedIn: true,

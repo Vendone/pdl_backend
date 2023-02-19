@@ -1,37 +1,42 @@
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const morgan = require("morgan");
-const session = require("express-session");
-const pgSession = require("connect-pg-simple")(session);
 const pg = require("pg");
-
-//connect with PostgresSQL
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+const pgSession = require("connect-pg-simple")(session);
 const connectionString = {
   connectionString: process.env.DATABASE_URL,
 };
 
-const pgPool = new pg.Pool(connectionString);
+const pgPool = new pg.Pool({
+  connectionString,
+});
 
 module.exports = (app) => {
   app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(cookieParser(process.env.SESSION_SECRET));
   app.use(morgan("dev"));
-  app.use(cors());
+  app.use(
+    cors({
+      origin: process.env.REACT_URL,
+      credentials: true,
+    })
+  );
 
   // Creates a session
   app.use(
     session({
       secret: process.env.SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false,
+      resave: true,
+      saveUninitialized: true,
       cookie: {
-        secure: true,
         maxAge: 24 * 60 * 60 * 1000,
+        secure: false,
       },
-      store: new pgSession({
-        pool: pgPool, // Connection pool
-        tableName: "user_sessions", // Use another table-name than the default "session" one
-        // Insert connect-pg-simple options here
-      }),
+      store: new (require("connect-pg-simple")(session))(),
+      createTableIfMissing: true,
     })
   );
 

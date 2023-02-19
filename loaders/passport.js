@@ -1,53 +1,49 @@
 const passport = require("passport");
-const LocalStrategy = require("passport-local");
-const db = require("../db");
-const bcrypt = require("bcrypt");
-const { findOneByEmail } = require("../helperFunctions/index");
+const LocalStrategy = require("passport-local").Strategy;
+const {
+  findOneByEmail,
+  compareIt,
+  findOneById,
+} = require("../helperFunctions/index");
 
 module.exports = (app) => {
+  // Configure strategy to be use for local login
+  passport.use(
+    new LocalStrategy(
+      { usernameField: "email" },
+      async (email, password, done) => {
+        try {
+          const user = await findOneByEmail(email);
+          if (!user) {
+            return done(null, false);
+          }
+          const passwordIsCorrect = await compareIt(password, user);
+          if (!passwordIsCorrect) {
+            return done(null, false);
+          }
+          return done(null, user);
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
+
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+
+  passport.deserializeUser(async (id, done) => {
+    const user = await findOneById(id);
+    if (!user) {
+      done(error);
+    }
+    done(null, user);
+  });
+
   // Initialize passport
   app.use(passport.initialize());
   app.use(passport.session());
-
-  // Set method to serialize data to store in cookie
-  passport.serializeUser((user, done) => {
-    // done(null, user.id);
-    done(null, { id: user.id, username: user.email });
-  });
-
-  // Set method to deserialize data stored in cookie and attach to req.user
-  passport.deserializeUser((id, done) => {
-    done(null, { id });
-  });
-
-  // Configure strategy to be use for local login
-  passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      //find user in database
-
-      const user = await findOneByEmail(username);
-
-      // Passwort prüfen
-      async function compareIt(password, userDb) {
-        const validPassword = await bcrypt.compare(password, userDb.password);
-        const passwordIsCorrect = await validPassword;
-        return passwordIsCorrect;
-      }
-
-      try {
-        const checkPassword = await compareIt(password, user);
-
-        if (!checkPassword) {
-          return done(null, false, {
-            message: "Incorrect username or password.",
-          });
-        }
-        return done(null, user);
-      } catch (err) {
-        return done(err);
-      }
-    })
-  );
 
   return passport;
 };
