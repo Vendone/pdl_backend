@@ -57,7 +57,7 @@ module.exports = (app, passport) => {
     async (req, res, next) => {
       try {
         const result = req.user;
-        delete result.password;
+        // delete result.password;
         res.status(200).send(result);
       } catch (err) {
         next(err);
