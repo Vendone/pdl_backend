@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { check } = require("express-validator");
+const { findOneById } = require("../helperFunctions/index");
 
 //Datenbank verbindung
 const db = require("../db");
@@ -9,6 +10,17 @@ const pgp = require("pg-promise")({ capSQL: true });
 //Exports
 module.exports = (app) => {
   app.use("/api/user", router);
+
+  router.get("/get", async (req, res, next) => {
+    const { id } = req.body;
+    try {
+      const user = await findOneById(id);
+      delete user.password;
+      res.send(user);
+    } catch (err) {
+      throw new Error(err);
+    }
+  });
 
   router.put(
     "/change",
@@ -52,7 +64,6 @@ module.exports = (app) => {
 
           res.status(200).send(result.rows[0]);
         } else if (params.nation || params.dart || params.dart_weight) {
-          console.log(params);
           // Generate SQL statement - using helper for dynamic parameter injection
           const condition = pgp.as.format("WHERE userid = ${id} RETURNING *", {
             id,
