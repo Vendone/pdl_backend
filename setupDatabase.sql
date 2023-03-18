@@ -107,8 +107,26 @@ ALTER TABLE "league" ADD FOREIGN KEY ("id") REFERENCES "gameplan" ("league_id");
 
 ALTER TABLE "user_stats" ADD FOREIGN KEY ("userid") REFERENCES "users" ("id");
 
+ALTER TABLE "user_stats" ADD CONSTRAINT unique_id UNIQUE (userid);
+
 ALTER TABLE "users" ALTER COLUMN "img" SET DEFAULT './blank.png';
 
 ALTER TABLE "users" ALTER COLUMN "createdAt" SET DEFAULT now();
 
 ALTER TABLE "users" ADD CONSTRAINT unique_email UNIQUE (email);
+
+
+
+-- Trigger
+
+CREATE OR REPLACE FUNCTION insert_into_user_stats()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO user_stats (userid) VALUES (NEW.id);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER insert_trigger
+AFTER INSERT ON users
+FOR EACH ROW EXECUTE PROCEDURE insert_into_user_stats();
