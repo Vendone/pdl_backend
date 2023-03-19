@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { check } = require("express-validator");
-const { findOneById } = require("../helperFunctions/index");
+const { findOneById, isAuthenticated } = require("../helperFunctions/index");
 
 //Datenbank verbindung
 const db = require("../db");
@@ -11,18 +11,11 @@ const pgp = require("pg-promise")({ capSQL: true });
 module.exports = (app) => {
   app.use("/api/user", router);
 
-  router.get("/get", async (req, res, next) => {
-    const { id } = req.body;
-    try {
-      if (id >= 1) {
-        const user = await findOneById(id);
-        console.log(req.user);
-        delete user.password;
-        res.send(user);
-      }
-    } catch (err) {
-      throw new Error(err);
-    }
+  router.get("/get", isAuthenticated, async (req, res, next) => {
+    const { id } = req.user;
+    const user = await findOneById(id);
+    delete user.password;
+    res.send(user);
   });
 
   router.put(
@@ -31,6 +24,7 @@ module.exports = (app) => {
     check("firstname").notEmpty().trim().escape().toLowerCase(),
     check("lastname").notEmpty().trim().escape().toLowerCase(),
     check("nickname").notEmpty().trim().escape(),
+    isAuthenticated,
     async (req, res, next) => {
       try {
         const params = req.body;
