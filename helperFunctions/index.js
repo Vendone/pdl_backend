@@ -1,6 +1,14 @@
 const db = require("../db");
 const bcrypt = require("bcrypt");
 
+function isAuthenticated(req, res, next) {
+  if (req.user) return next();
+  else
+    return res.status(401).json({
+      error: "User not authenticated",
+    });
+}
+
 async function findOneByEmail(email) {
   const statement = `SELECT users.id, users.email, users.password, users.firstname, users.lastname, users.nickname, users.img, 
   users.userlvl, user_stats.dart, user_stats.dart_weight, user_stats.nation, user_stats.ligaid
@@ -16,7 +24,7 @@ FROM users LEFT JOIN user_stats ON users.id = user_stats.userid WHERE email = $1
 }
 
 async function findOneById(id) {
-  const statement = `SELECT users.email, users.password, users.firstname, users.lastname, users.nickname, users.img, 
+  const statement = `SELECT users.id, users.email, users.password, users.firstname, users.lastname, users.nickname, users.img, 
   users.userlvl, user_stats.dart, user_stats.dart_weight, user_stats.nation, user_stats.ligaid
 FROM users LEFT JOIN user_stats ON users.id = user_stats.userid WHERE users.id = $1 ORDER BY users.id`;
   const values = [id];
@@ -33,4 +41,4 @@ async function compareIt(password, userDb) {
   return passwordIsCorrect;
 }
 
-module.exports = { findOneByEmail, findOneById, compareIt };
+module.exports = { findOneByEmail, findOneById, compareIt, isAuthenticated };

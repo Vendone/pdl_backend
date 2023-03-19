@@ -14,9 +14,12 @@ module.exports = (app) => {
   router.get("/get", async (req, res, next) => {
     const { id } = req.body;
     try {
-      const user = await findOneById(id);
-      delete user.password;
-      res.send(user);
+      if (id >= 1) {
+        const user = await findOneById(id);
+        console.log(req.user);
+        delete user.password;
+        res.send(user);
+      }
     } catch (err) {
       throw new Error(err);
     }

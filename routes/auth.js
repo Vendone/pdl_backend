@@ -4,8 +4,11 @@ const bcrypt = require("bcrypt");
 const { check } = require("express-validator");
 const db = require("../db");
 const pgp = require("pg-promise")({ capSQL: true });
-const { findOneByEmail } = require("../helperFunctions/index");
-const { findOneById } = require("../helperFunctions/index");
+const {
+  findOneByEmail,
+  findOneById,
+  isAuthenticated,
+} = require("../helperFunctions/index");
 
 module.exports = (app, passport) => {
   app.use("/api/auth", router);
@@ -66,7 +69,7 @@ module.exports = (app, passport) => {
   );
 
   // Check Login Status Endpoint
-  router.get("/logged_in", async (req, res, next) => {
+  router.get("/checkauth", isAuthenticated, async (req, res, next) => {
     try {
       const user = await findOneById(req.user.id);
       delete user.password;
