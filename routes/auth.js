@@ -7,7 +7,8 @@ const pgp = require("pg-promise")({ capSQL: true });
 const {
   findOneByEmail,
   findOneById,
-  isAuthenticated,
+  checkAuthenticated,
+  checkNotAuthenticated,
 } = require("../helperFunctions/index");
 
 module.exports = (app, passport) => {
@@ -21,6 +22,7 @@ module.exports = (app, passport) => {
     check("nickname").notEmpty().trim().escape(),
     check("password").notEmpty(),
     check("confirmpassword").notEmpty(),
+    checkNotAuthenticated,
     async (req, res, next) => {
       try {
         const data = req.body;
@@ -69,7 +71,7 @@ module.exports = (app, passport) => {
   );
 
   // Check Login Status Endpoint
-  router.get("/checkauth", isAuthenticated, async (req, res, next) => {
+  router.get("/checkauth", checkAuthenticated, async (req, res, next) => {
     try {
       const user = await findOneById(req.user.id);
       delete user.password;

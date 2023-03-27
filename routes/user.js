@@ -1,18 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const { check } = require("express-validator");
-const { findOneById, isAuthenticated } = require("../helperFunctions/index");
+const { findOneById, checkAuthenticated } = require("../helperFunctions/index");
 
 //Datenbank verbindung
 const db = require("../db");
 const pgp = require("pg-promise")({ capSQL: true });
 
 //Exports
-module.exports = (app) => {
+module.exports = (app, passport) => {
   app.use("/api/user", router);
 
-  router.get("/get", isAuthenticated, async (req, res, next) => {
-    const { id } = req.user;
+  router.get("/get", async (req, res, next) => {
+    const { id } = req.body;
     const user = await findOneById(id);
     delete user.password;
     res.send(user);
@@ -20,11 +20,11 @@ module.exports = (app) => {
 
   router.put(
     "/change",
-    check("email").isEmail().normalizeEmail(),
-    check("firstname").notEmpty().trim().escape().toLowerCase(),
-    check("lastname").notEmpty().trim().escape().toLowerCase(),
-    check("nickname").notEmpty().trim().escape(),
-    isAuthenticated,
+    // check("email").isEmail().normalizeEmail(),
+    // check("firstname").trim().escape().toLowerCase(),
+    // check("lastname").trim().escape().toLowerCase(),
+    // check("nickname").trim().escape(),
+    // checkAuthenticated,
     async (req, res, next) => {
       try {
         const params = req.body;
@@ -76,7 +76,7 @@ module.exports = (app) => {
           res.status(500);
         }
       } catch (err) {
-        throw new Error(err);
+        console.log(err);
       }
     }
   );

@@ -1,12 +1,18 @@
 const db = require("../db");
 const bcrypt = require("bcrypt");
 
-function isAuthenticated(req, res, next) {
-  if (req.user) return next();
-  else
-    return res.status(401).json({
-      error: "User not authenticated",
-    });
+function checkAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect(`${process.env.REACT_URL}/login`);
+}
+
+function checkNotAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    res.redirect(`${process.env.REACT_URL}`);
+  }
+  next();
 }
 
 async function findOneByEmail(email) {
@@ -41,4 +47,10 @@ async function compareIt(password, userDb) {
   return passwordIsCorrect;
 }
 
-module.exports = { findOneByEmail, findOneById, compareIt, isAuthenticated };
+module.exports = {
+  findOneByEmail,
+  findOneById,
+  compareIt,
+  checkAuthenticated,
+  checkNotAuthenticated,
+};

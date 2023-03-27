@@ -1,4 +1,5 @@
 require("dotenv").config();
+const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -15,11 +16,13 @@ const pgPool = new pg.Pool({
 module.exports = (app) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(cookieParser(process.env.SESSION_SECRET));
+  app.use(cookieParser());
+  app.use(express.urlencoded({ extended: false }));
   app.use(morgan("dev"));
   app.use(
     cors({
       origin: process.env.REACT_URL,
+      methods: ["POST", "PUT", "GET", "OPTIONS", "DELETE"],
       credentials: true,
     })
   );
