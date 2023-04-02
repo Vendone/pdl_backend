@@ -1,4 +1,5 @@
 const express = require("express");
+const passport = require("passport");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { check } = require("express-validator");
@@ -54,21 +55,21 @@ module.exports = (app, passport) => {
     }
   );
 
-  router.post(
-    "/login",
-    check("email").isEmail().normalizeEmail(),
-    check("password").notEmpty(),
-    passport.authenticate("local"),
-    async (req, res, next) => {
-      try {
-        const result = req.user;
-        delete result.password;
-        res.status(200).send(result);
-      } catch (err) {
-        next(err);
-      }
-    }
-  );
+  // router.post(
+  //   "/login",
+  //   check("email").isEmail().normalizeEmail(),
+  //   check("password").notEmpty(),
+  //   passport.authenticate("local", { failureRedirect: "/login" }),
+  //   async (req, res, next) => {
+  //     try {
+  //       const result = req.user;
+  //       delete result.password;
+  //       res.status(200).send(result);
+  //     } catch (err) {
+  //       next(err);
+  //     }
+  //   }
+  // );
 
   // Check Login Status Endpoint
   router.get("/checkauth", checkAuthenticated, async (req, res, next) => {
