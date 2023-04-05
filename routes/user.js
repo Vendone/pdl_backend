@@ -20,11 +20,13 @@ module.exports = (app, passport) => {
 
   router.put(
     "/change",
-    // check("email").isEmail().normalizeEmail(),
-    // check("firstname").trim().escape().toLowerCase(),
-    // check("lastname").trim().escape().toLowerCase(),
-    // check("nickname").trim().escape(),
-    // checkAuthenticated,
+    check("email").isEmail().normalizeEmail(),
+    check("firstname").trim().escape().toLowerCase(),
+    check("lastname").trim().escape().toLowerCase(),
+    check("nickname").trim().escape(),
+    check("nation").trim().escape().toUpperCase(),
+    check("dart").trim().escape(),
+    // check("dart_weight").trim().escape().isInt(),
     async (req, res, next) => {
       try {
         const params = req.body;
@@ -41,6 +43,15 @@ module.exports = (app, passport) => {
         }
         if (params.nickname == "") {
           delete params.nickname;
+        }
+        if (params.nation == "") {
+          delete params.nation;
+        }
+        if (params.dart == "") {
+          delete params.dart;
+        }
+        if (params.dart_weight == "") {
+          delete params.dart_weight;
         }
 
         if (
@@ -60,7 +71,31 @@ module.exports = (app, passport) => {
           const result = await db.query(statement);
 
           res.status(200).send(result.rows[0]);
-        } else if (params.nation || params.dart || params.dart_weight) {
+        } else if (params.nation) {
+          // Generate SQL statement - using helper for dynamic parameter injection
+          const condition = pgp.as.format("WHERE userid = ${id} RETURNING *", {
+            id,
+          });
+          const statement =
+            pgp.helpers.update(params, null, "user_stats") + condition;
+
+          // Execute SQL statment
+          const result = await db.query(statement);
+
+          res.status(200).send(result.rows[0]);
+        } else if (params.dart) {
+          // Generate SQL statement - using helper for dynamic parameter injection
+          const condition = pgp.as.format("WHERE userid = ${id} RETURNING *", {
+            id,
+          });
+          const statement =
+            pgp.helpers.update(params, null, "user_stats") + condition;
+
+          // Execute SQL statment
+          const result = await db.query(statement);
+
+          res.status(200).send(result.rows[0]);
+        } else if (params.dart_weight) {
           // Generate SQL statement - using helper for dynamic parameter injection
           const condition = pgp.as.format("WHERE userid = ${id} RETURNING *", {
             id,
