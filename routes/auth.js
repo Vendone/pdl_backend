@@ -1,11 +1,16 @@
 const express = require("express");
+const passport = require("passport");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { check } = require("express-validator");
 const db = require("../db");
 const pgp = require("pg-promise")({ capSQL: true });
-const { findOneByEmail } = require("../helperFunctions/index");
-const { findOneById } = require("../helperFunctions/index");
+const {
+  findOneByEmail,
+  findOneById,
+  checkAuthenticated,
+  checkNotAuthenticated,
+} = require("../helperFunctions/index");
 
 module.exports = (app, passport) => {
   app.use("/api/auth", router);
@@ -18,6 +23,7 @@ module.exports = (app, passport) => {
     check("nickname").notEmpty().trim().escape(),
     check("password").notEmpty(),
     check("confirmpassword").notEmpty(),
+    checkNotAuthenticated,
     async (req, res, next) => {
       try {
         const data = req.body;
@@ -49,24 +55,24 @@ module.exports = (app, passport) => {
     }
   );
 
-  router.post(
-    "/login",
-    check("email").isEmail().normalizeEmail(),
-    check("password").notEmpty(),
-    passport.authenticate("local"),
-    async (req, res, next) => {
-      try {
-        const result = req.user;
-        delete result.password;
-        res.status(200).send(result);
-      } catch (err) {
-        next(err);
-      }
-    }
-  );
+  // router.post(
+  //   "/login",
+  //   check("email").isEmail().normalizeEmail(),
+  //   check("password").notEmpty(),
+  //   passport.authenticate("local", { failureRedirect: "/login" }),
+  //   async (req, res, next) => {
+  //     try {
+  //       const result = req.user;
+  //       delete result.password;
+  //       res.status(200).send(result);
+  //     } catch (err) {
+  //       next(err);
+  //     }
+  //   }
+  // );
 
   // Check Login Status Endpoint
-  router.get("/logged_in", async (req, res, next) => {
+  router.get("/checkauth", checkAuthenticated, async (req, res, next) => {
     try {
       const user = await findOneById(req.user.id);
       delete user.password;

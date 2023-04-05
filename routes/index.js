@@ -1,4 +1,3 @@
-const testRouter = require("./test");
 const authRouter = require("./auth");
 const userRouter = require("./user");
 // const cartRouter = require('./cart');
@@ -7,8 +6,7 @@ const userRouter = require("./user");
 
 module.exports = (app, passport) => {
   authRouter(app, passport);
-  testRouter(app);
-  userRouter(app);
+  userRouter(app, passport);
   //   orderRouter(app);
   //   productRouter(app);
 };
