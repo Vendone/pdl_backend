@@ -11,10 +11,9 @@ const pgp = require("pg-promise")({ capSQL: true });
 module.exports = (app, passport) => {
   app.use("/api/user", router);
 
-  router.get("/get", async (req, res, next) => {
+  router.post("/get", async (req, res, next) => {
     const { id } = req.body;
     const user = await findOneById(id);
-    delete user.password;
     res.send(user);
   });
 
