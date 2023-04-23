@@ -14,7 +14,9 @@ module.exports = (app, passport) => {
   router.post("/get", async (req, res, next) => {
     const { id } = req.body;
     const user = await findOneById(id);
-    delete user.password;
+    if (user.password) {
+      delete user.password;
+    }
     res.send(user);
   });
 
