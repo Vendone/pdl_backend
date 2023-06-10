@@ -9,7 +9,14 @@ module.exports = (app) => {
   app.use("/api/player", router);
 
   router.get("/", async (req, res, next) => {
-    const player = { name: "test", liga: 1 };
-    res.send(player);
+    const statement = `SELECT firstname, lastname, nickname FROM users`;
+    const player = await db.query(statement);
+    if (!player) {
+      return done(null, false, {
+        message: "no Player",
+      });
+    }
+
+    res.send(player.rows);
   });
 };
