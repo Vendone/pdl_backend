@@ -16,13 +16,7 @@ const connectionString = {
 };
 const sessionPool = require("pg").Pool;
 
-const sessionDBaccess = new sessionPool({
-  user: "postgres",
-  password: "swud7zsd",
-  host: "localhost",
-  port: 5432,
-  database: "pdl",
-});
+const sessionDBaccess = new sessionPool(connectionString);
 
 const pgPool = new pg.Pool({
   connectionString,
