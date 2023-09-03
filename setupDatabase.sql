@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS "user_stats" (
   "dart" varchar,
   "dart_weight" int,
   "nation" varchar,
-  "ligaid" varchar
+  "ligaid" int
 );
 
 CREATE TABLE IF NOT EXISTS "user_sessions" (
