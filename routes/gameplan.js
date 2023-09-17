@@ -11,7 +11,7 @@ module.exports = (app) => {
   router.get("/", async (req, res, next) => {
     const statement = `
     SELECT 
-    *
+    player1, player2, season_id, league_id, start, "end", title
     FROM gameplan`;
     const gameplan = await db.query(statement);
     if (!gameplan) {
