@@ -22,4 +22,13 @@ module.exports = (app) => {
 
     res.send(gameplan.rows);
   });
+
+  router.post("/", async (req, res, next) => {
+    try {
+      await db.query(pgp.helpers.insert(req.body, null, "gameplan"));
+      res.status(201).send();
+    } catch (err) {
+      next(err);
+    }
+  });
 };
